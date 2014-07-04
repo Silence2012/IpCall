@@ -1,28 +1,19 @@
 __author__ = 'u1404'
 import ipaddress
-import random
-
+import sys
 class IpCall(object):
     '''This is an ip class'''
-    dt ={}
     listIp = []
     listIpUsed =[]
-    def list2dict(self):
-        '''Change the ip list into a ip dict'''
-        for i in range(len(self.listIp)):
-            self.dt[self.listIp[i]] = i
-
-    def ip2file(self):
+    def ip_used2file(self):
         '''Make the ip that used into a file'''
         with open("ipUsed.txt","w") as fs:
             for i in range(len(self.listIpUsed)):
                 fs.writelines(self.listIpUsed[i]+'\n')
-            #fs.flush()
-
     def ip_direct_req(self,ipNum):
         '''Get an ip from a file'''
         if ipNum > 0:
-            while ipNum:
+            for i in range(ipNum):
                 if self.listIp:
                     lista = self.listIp.pop(-1)
                     print lista
@@ -30,29 +21,24 @@ class IpCall(object):
                 else:
                     print "The ip pool is used up."
                     break
-
-                ipNum -= 1
-            #print self.listIpUsed
-            self.ip2file()
-        #print "ip_dirct_req does"
-        #print self.listIpUsed
+            self.ip_used2file()
 
     def ip_specify_req(self,ipData):
         '''Get the specify ip function'''
-
         if ipData in self.listIpUsed:
             print "It's an used ip , select another ip please!"
             print self.listIpUsed
-
         elif ipData in self.listIp:
             self.listIpUsed.append(self.listIp.pop(self.listIp.index(ipData)))
             print self.listIpUsed
-
-            self.ip2file()
+            self.ip_used2file()
             print "assign success"
-            return True
+            print self.listIpUsed
+
         else :
-            print 'The input data is out of the ip range,redo it please!   '
+            print 'The input data is out of the ip pool,redo it please!   '
+            print self.listIp
+
     def ip_release(self,dataIp):
         '''This function is ursed to release ip'''
         if dataIp in self.listIpUsed:
@@ -62,61 +48,35 @@ class IpCall(object):
             print self.listIpUsed
         else:
             print 'This Ip is not in used , check it please'
-
-
-    def open_file_func(self,filename):
+        self.ip_used2file()
+    def open_ipfile_func(self,filename):
         '''open the ip file '''
         with open(filename) as fs:
-            #print fs.readlines()
             self.listIp = fs.readlines()
             if self.listIp[-1] == '':
                 self.listIp.pop()
-
-            #print self.listIp
-    def ip_init(self):
-        '''Generate an ip range into a file'''
-        #dataIp = raw_input('input the CIDR network (e.g.,192.168.1.0/24):  ')
-        dataIp = u"192.168.1.0/24"
-        net = ipaddress.ip_network(dataIp)
-        with open("ip.txt",'wt') as f:
-            for i in net :
-                f.writelines(str(i))
-                f.write('\n')
-
+            for i in range(len(self.listIp)):
+                if self.listIp[i].find('\n'):
+                    self.listIp[i] = self.listIp[i][:-1]
 
     def __init__(self):
-        self.ip_init()
-        self.open_file_func('ip.txt')
-
-        print '1.input an ip range       '
-        print '2.input a specify ip      '
-        print '3.input the released ip   '
-        while True:
-            #print self.listIpUsed
-            #self.ip2file()
-            choice = input("intput your choice:  ")
-            if not choice:
-                break
-            elif choice == 1:
-                num = input('input the number of ip you want to get:  ')
-                self.ip_direct_req(num)
+        self.open_ipfile_func('ip.txt')
+        if len(sys.argv) == 3:
+            choice = int(sys.argv[1])
+            if choice == 1:
+                self.ip_direct_req(int(sys.argv[2]))
             elif choice == 2:
-
-                while True:
-                    ipData = raw_input('input the specify ip(e.g.,192.168.1.x):  ')
-                    if not ipData:break
-                    state = self.ip_specify_req(ipData)
-                    if state:
-                        break
-            elif choice == 3:
-                dataIp = raw_input("Input the ip which you want to release :")
-                self.ip_release(dataIp)
+                self.ip_specify_req(sys.argv[2])
+            elif choice == 3 :
+                self.ip_release(sys.argv[2])
             else:
-                print "choise the 1 , 2 or 3  !"
+                print "The first argument should be 1,2 or 3."
+        else :
+            print "the number of argument is wrong !"
 
-    if __name__ == '__main__':
+
+if __name__ == '__main__':
         pass
+a=IpCall()
 
 
-
-a = IpCall()
