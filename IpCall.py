@@ -1,8 +1,27 @@
 __author__ = 'u1404'
 import ipaddress
 import sys
+def main():
+    a = IpCall()
+    if len(sys.argv) >= 3:
+        choice = int(sys.argv[1])
+        if choice == 1:
+            a.ip_direct_req(int(sys.argv[2]))
+        elif choice == 2:
+            a.ip_specify_req(sys.argv[2])
+        elif choice == 3 :
+            a.ip_release(sys.argv[2:])
+        else:
+            print "The first argument should be 1,2 or 3."
+    else :
+        print "the number of argument is wrong !"
 class IpCall(object):
-    '''This is an ip class'''
+    'This is an ip class'
+    instance = None
+    def __new__(cls, *args, **kwargs):
+        if not cls.instance:
+            cls.instance = object.__new__(cls,*args,**kwargs)
+        return cls.instance
     listIp = []
     listIpUsed =[]
     def ip2file(self):
@@ -79,26 +98,10 @@ class IpCall(object):
                 for i in range(len(self.listIpUsed)):
                     if self.listIpUsed[i].find('\n') != -1:
                         self.listIpUsed[i] = self.listIpUsed[i][:-1]
-
-
     def __init__(self):
         self.open_ipfile_func()
-        if len(sys.argv) >= 3:
-            choice = int(sys.argv[1])
-            if choice == 1:
-                self.ip_direct_req(int(sys.argv[2]))
-            elif choice == 2:
-                self.ip_specify_req(sys.argv[2])
-            elif choice == 3 :
-                self.ip_release(sys.argv[2:])
-            else:
-                print "The first argument should be 1,2 or 3."
-        else :
-            print "the number of argument is wrong !"
-
-
 if __name__ == '__main__':
-        pass
-a=IpCall()
+    main()
+
 
 
